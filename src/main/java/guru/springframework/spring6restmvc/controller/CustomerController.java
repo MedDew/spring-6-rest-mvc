@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -29,6 +30,14 @@ public class CustomerController {
 
     @Autowired()
     private final CustomerService customerService;
+
+    @PatchMapping(path = {"{id}"})
+    public ResponseEntity updateCustomerPatchById(@PathVariable(name = "id") UUID customerId, @RequestBody Customer customer) {
+
+        customerService.patchCustomerById(customerId, customer);
+
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
 
     @DeleteMapping(path = {"{customerId}"})
     public ResponseEntity<String> deleteById(@PathVariable(value = "customerId") UUID id) {
