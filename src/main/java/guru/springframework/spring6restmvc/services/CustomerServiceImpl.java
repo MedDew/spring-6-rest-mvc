@@ -51,6 +51,15 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    public void updateCustomerById(UUID customerId, Customer customer) {
+        Customer existing = customerMap.get(customerId);
+        existing.setCustomerName(customer.getCustomerName());
+        existing.setVersion(customer.getVersion());
+        existing.setLastModifiededDate(LocalDateTime.now());
+
+    }
+
+    @Override
     public List<Customer> listCustomers() {
         log.info("Number of customers in DB: " + customerMap.size());
         return List.of(customerMap.values().toArray(new Customer[0]));
