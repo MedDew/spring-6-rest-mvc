@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.core.Is.is;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CustomerController.class)
 class CustomerControllerTest {
@@ -37,6 +38,7 @@ class CustomerControllerTest {
                 get("/api/v1/customer")
                 .accept(MediaType.APPLICATION_JSON)
         )
+        .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.length()", is(3)));
     }
@@ -51,6 +53,7 @@ class CustomerControllerTest {
                 get("/api/v1/customer/" + testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         )
+        .andExpect(status().isOk())
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(jsonPath("$.id", is(testCustomer.getId().toString())))
         .andExpect(jsonPath("$.customerName", is(testCustomer.getCustomerName())));
