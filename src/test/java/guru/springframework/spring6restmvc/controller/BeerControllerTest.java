@@ -34,8 +34,10 @@ class BeerControllerTest {
                                       .equals(MediaType.APPLICATION_JSON);
 
 
-        mockMvc.perform(get("/api/v1/beer/"+UUID.randomUUID()))
-                //.andExpect(resultMatcher.match())
+        mockMvc.perform(
+                    get("/api/v1/beer/"+UUID.randomUUID())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk());
     }
 }
