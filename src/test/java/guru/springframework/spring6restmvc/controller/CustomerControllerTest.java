@@ -1,5 +1,6 @@
 package guru.springframework.spring6restmvc.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.spring6restmvc.model.Customer;
 import guru.springframework.spring6restmvc.services.CustomerService;
@@ -14,8 +15,10 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -39,6 +42,23 @@ class CustomerControllerTest {
     @BeforeEach
     public void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
+    }
+
+    @Test
+    public void updateByIdTest() throws Exception {
+        Customer customerPayload =  customerServiceImpl.listCustomers().get(0);
+
+        mockMvc.perform(
+                put("/api/v1/customer/"+customerPayload.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customerPayload))
+        )
+        .andExpect(
+                status().isNoContent()
+        );
+
+        verify(customerService).updateCustomerById(customerPayload.getId(), customerPayload);
     }
 
     @Test
