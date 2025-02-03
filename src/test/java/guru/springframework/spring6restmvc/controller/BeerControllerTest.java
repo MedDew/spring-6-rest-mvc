@@ -1,25 +1,22 @@
 package guru.springframework.spring6restmvc.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import guru.springframework.spring6restmvc.model.Beer;
 import guru.springframework.spring6restmvc.services.BeerService;
 import guru.springframework.spring6restmvc.services.BeerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.UUID;
-
 import static org.hamcrest.core.Is.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -49,6 +46,20 @@ class BeerControllerTest {
     @BeforeEach
     public void setup() {
         beerServiceImpl = new BeerServiceImpl();
+    }
+
+    @Test
+    public void testDeleteBeer() throws Exception {
+        Beer beer = beerServiceImpl.listBeers().get(0);
+
+        mockMvc.perform(
+                delete("/api/v1/beer/"+beer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNoContent());
+
+        verify(beerService).deleteBeerById(beer.getId());
+
     }
 
     @Test
