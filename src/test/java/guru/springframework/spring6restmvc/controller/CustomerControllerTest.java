@@ -68,7 +68,7 @@ class CustomerControllerTest {
         payload.put("customerName", "MedGaz");
 
         mockMvc.perform(
-                patch(CustomerController.CUSTOMER_PATH+"/"+customer.getId())
+                patch(CustomerController.CUSTOMER_PATH_ID, customer.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(payload))
@@ -87,7 +87,7 @@ class CustomerControllerTest {
         Customer customer = customerServiceImpl.listCustomers().get(0);
 
         mockMvc.perform(
-                delete(CustomerController.CUSTOMER_PATH+"/"+customer.getId())
+                delete(CustomerController.CUSTOMER_PATH_ID, customer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isNoContent());
@@ -102,7 +102,7 @@ class CustomerControllerTest {
         Customer customerPayload =  customerServiceImpl.listCustomers().get(0);
 
         mockMvc.perform(
-                put(CustomerController.CUSTOMER_PATH+"/"+customerPayload.getId())
+                put(CustomerController.CUSTOMER_PATH_ID, customerPayload.getId())
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerPayload))
@@ -156,7 +156,7 @@ class CustomerControllerTest {
         given(customerService.getCustomerById(testCustomer.getId())).willReturn(testCustomer);
 
         mockMvc.perform(
-                get(CustomerController.CUSTOMER_PATH+"/" + testCustomer.getId())
+                get(CustomerController.CUSTOMER_PATH_ID, testCustomer.getId())
                 .accept(MediaType.APPLICATION_JSON)
         )
         .andExpect(status().isOk())
