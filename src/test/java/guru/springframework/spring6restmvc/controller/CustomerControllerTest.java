@@ -15,6 +15,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -23,6 +25,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -48,9 +51,34 @@ class CustomerControllerTest {
     @Captor
     ArgumentCaptor<UUID>  uuidArgumentCaptor;
 
+    @Captor
+    ArgumentCaptor<Customer> customerArgumentCaptor;
+
     @BeforeEach
     public void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
+    }
+
+    @Test
+    public void updateCustomerPatchByIdTest() throws Exception {
+
+        Customer customer = customerServiceImpl.listCustomers().get(0);
+
+        Map<String, String> payload = new HashMap<>();
+        payload.put("customerName", "MedGaz");
+
+        mockMvc.perform(
+                patch("/api/v1/customer/"+customer.getId())
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(payload))
+        )
+        .andExpect(status().isNoContent());
+
+        verify(customerService).patchCustomerById(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
+
+        assertThat(customer.getId()).isEqualTo(uuidArgumentCaptor.getValue());
+        assertThat(payload.get("customerName")).isEqualTo(customerArgumentCaptor.getValue().getCustomerName());
     }
 
     @Test
