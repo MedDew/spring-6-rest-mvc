@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,13 +26,15 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/customer")
 public class CustomerController {
+
+    public static final String CUSTOMER_PATH = "/api/v1/customer";
+    public static final String CUSTOMER_PATH_ID = CUSTOMER_PATH+"/{customerId}";
 
     @Autowired()
     private final CustomerService customerService;
 
-    @PatchMapping(path = {"{id}"})
+    @PatchMapping(path = {CUSTOMER_PATH+"/{id}"})
     public ResponseEntity updateCustomerPatchById(@PathVariable(name = "id") UUID customerId, @RequestBody Customer customer) {
 
         customerService.patchCustomerById(customerId, customer);
@@ -39,14 +42,14 @@ public class CustomerController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping(path = {"{customerId}"})
+    @DeleteMapping(path = {CUSTOMER_PATH_ID})
     public ResponseEntity<String> deleteById(@PathVariable(value = "customerId") UUID id) {
         customerService.deleteCustomerByid(id);
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping("{customerId}")
+    @PutMapping(CUSTOMER_PATH_ID)
     public ResponseEntity updateById(@PathVariable UUID customerId, @RequestBody Customer customer) {
 
         customerService.updateCustomerById(customerId, customer);
@@ -54,7 +57,7 @@ public class CustomerController {
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping
+    @PostMapping(path = CUSTOMER_PATH)
     public ResponseEntity handlePost(@RequestBody Customer customer) {
         Customer customerSaved = customerService.saveNewCustomer(customer);
 
@@ -65,12 +68,12 @@ public class CustomerController {
     }
 
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping(path = {CUSTOMER_PATH})
     public List<Customer> listCustomers() {
         return customerService.listCustomers();
     }
 
-    @RequestMapping(path = "/{customerId}", method = RequestMethod.GET)
+    @GetMapping(path = CUSTOMER_PATH_ID)
     public Customer getCustomerById(@PathVariable UUID customerId) {
         return customerService.getCustomerById(customerId);
     }
