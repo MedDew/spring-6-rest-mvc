@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -77,6 +78,6 @@ public class BeerController {
     @GetMapping(path=BEER_PATH_ID)
     public Beer getBeerById(@PathVariable(name = "beerId") UUID id){
         log.info("Get Beer by Id - in controller");
-        return beerService.getBeerById(id);
+        return beerService.getBeerById(id).orElseThrow(NotFoundException::new);
     }
 }
