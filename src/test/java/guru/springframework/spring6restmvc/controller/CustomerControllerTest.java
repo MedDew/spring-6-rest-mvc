@@ -1,8 +1,7 @@
 package guru.springframework.spring6restmvc.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import guru.springframework.spring6restmvc.model.Customer;
+import guru.springframework.spring6restmvc.model.CustomerDTO;
 import guru.springframework.spring6restmvc.services.CustomerService;
 import guru.springframework.spring6restmvc.services.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +52,7 @@ class CustomerControllerTest {
     ArgumentCaptor<UUID>  uuidArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<Customer> customerArgumentCaptor;
+    ArgumentCaptor<CustomerDTO> customerArgumentCaptor;
 
     @BeforeEach
     public void setUp() {
@@ -63,7 +62,7 @@ class CustomerControllerTest {
     @Test
     public void updateCustomerPatchByIdTest() throws Exception {
 
-        Customer customer = customerServiceImpl.listCustomers().get(0);
+        CustomerDTO customer = customerServiceImpl.listCustomers().get(0);
 
         Map<String, String> payload = new HashMap<>();
         payload.put("customerName", "MedGaz");
@@ -85,7 +84,7 @@ class CustomerControllerTest {
     @Test
     public void deleteByIdTest() throws Exception {
 
-        Customer customer = customerServiceImpl.listCustomers().get(0);
+        CustomerDTO customer = customerServiceImpl.listCustomers().get(0);
 
         mockMvc.perform(
                 delete(CustomerController.CUSTOMER_PATH_ID, customer.getId())
@@ -100,7 +99,7 @@ class CustomerControllerTest {
 
     @Test
     public void updateByIdTest() throws Exception {
-        Customer customerPayload =  customerServiceImpl.listCustomers().get(0);
+        CustomerDTO customerPayload =  customerServiceImpl.listCustomers().get(0);
 
         mockMvc.perform(
                 put(CustomerController.CUSTOMER_PATH_ID, customerPayload.getId())
@@ -118,10 +117,10 @@ class CustomerControllerTest {
     @Test
     public void handlePostTest() throws Exception {
 
-        Customer customerPayload = customerServiceImpl.listCustomers().get(0);
+        CustomerDTO customerPayload = customerServiceImpl.listCustomers().get(0);
         customerPayload.setId(null);
 
-        given(customerService.saveNewCustomer(any(Customer.class)))
+        given(customerService.saveNewCustomer(any(CustomerDTO.class)))
         .willReturn(customerServiceImpl.listCustomers().get(1));
 
         mockMvc.perform(
@@ -163,7 +162,7 @@ class CustomerControllerTest {
     @Test
     public void getCustomerByIdTest() throws Exception {
 
-        Customer testCustomer = customerServiceImpl.listCustomers().get(0);
+        CustomerDTO testCustomer = customerServiceImpl.listCustomers().get(0);
         given(customerService.getCustomerById(testCustomer.getId())).willReturn(Optional.of(testCustomer));
 
         mockMvc.perform(
