@@ -39,6 +39,8 @@ class BeerControllerIT {
         });
     }
 
+    @Transactional
+    @Rollback
     @Test
     public void updateExistingBeer(){
         Beer beer = beerRepository.findAll().get(0);
