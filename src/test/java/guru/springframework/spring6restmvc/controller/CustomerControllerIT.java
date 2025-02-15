@@ -33,6 +33,12 @@ class CustomerControllerIT {
     @Autowired
     private CustomerMapper customerMapper;
 
+    @Test
+    public void updateCustomerPatchByIdNotFoundTest(){
+        assertThrows(NotFoundException.class, () -> {
+            customerController.updateCustomerPatchById(UUID.randomUUID(), null);
+        });
+    }
 
     @Transactional
     @Rollback
