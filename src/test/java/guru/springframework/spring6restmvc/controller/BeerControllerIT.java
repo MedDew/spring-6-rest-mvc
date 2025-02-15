@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +31,22 @@ class BeerControllerIT {
 
     @Autowired
     private BeerMapper beerMapper;
+
+    @Test
+    public void patchBeerByIdTest(){
+        BeerDTO beerDTO = beerMapper.beerToBeerDTO(
+                beerRepository.findAll().get(0)
+        );
+        BigDecimal newPrice = new BigDecimal(4.00);
+        beerDTO.setPrice(newPrice);
+
+        ResponseEntity responseEntity = beerController.updateBeerPatchById(beerDTO.getId(),beerDTO);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        Beer patchedBeer = beerRepository.findById(beerDTO.getId()).get();
+        assertThat(patchedBeer.getPrice())
+                .usingComparator(BigDecimal::compareTo)
+                .isEqualTo(newPrice);
+    }
 
     @Test
     public void testDeleteByIdNotFound() {
