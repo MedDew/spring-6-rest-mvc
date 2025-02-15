@@ -4,7 +4,6 @@ import guru.springframework.spring6restmvc.entities.Customer;
 import guru.springframework.spring6restmvc.mappers.CustomerMapper;
 import guru.springframework.spring6restmvc.model.CustomerDTO;
 import guru.springframework.spring6restmvc.repositories.CustomerRepository;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,13 +49,25 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void updateCustomerById(UUID customerId, CustomerDTO customer) {
-        Customer foundCustomer = customerRepository.findById(customerId).orElse(null);
-        if (foundCustomer != null) {
-            foundCustomer.setCustomerName(customer.getCustomerName());
-            foundCustomer.setLastModifiededDate(LocalDateTime.now());
-            customerRepository.saveAndFlush(foundCustomer);
-        }
+    public Optional<CustomerDTO> updateCustomerById(UUID customerId, CustomerDTO customer) {
+        AtomicReference<Optional<CustomerDTO>> customerAtomicRef = new AtomicReference<>();
+
+        customerRepository.findById(customerId).ifPresentOrElse(foundCustomer -> {
+                    //UPDATING the FOUND Customer
+                    foundCustomer.setCustomerName(customer.getCustomerName());
+                    foundCustomer.setLastModifiededDate(LocalDateTime.now());
+
+                    customerRepository.saveAndFlush(foundCustomer);
+                    customerAtomicRef.set(Optional.of(
+                            customerMapper.customerToCustomerDTO(
+                                foundCustomer
+                            )
+                    ));
+                },
+                () -> customerAtomicRef.set(Optional.empty())
+        );
+
+        return customerAtomicRef.get();
     }
 
     @Override
