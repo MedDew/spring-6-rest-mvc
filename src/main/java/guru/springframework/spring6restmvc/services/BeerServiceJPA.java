@@ -1,5 +1,6 @@
 package guru.springframework.spring6restmvc.services;
 
+import guru.springframework.spring6restmvc.entities.Beer;
 import guru.springframework.spring6restmvc.mappers.BeerMapper;
 import guru.springframework.spring6restmvc.model.BeerDTO;
 import guru.springframework.spring6restmvc.repositories.BeerRepository;
@@ -83,8 +84,11 @@ public class BeerServiceJPA implements BeerService {
     }
 
     @Override
-    public void patchBeerById(UUID beerId, BeerDTO beer) {
-        beerRepository.findById(beerId).ifPresent(
+    public Optional<BeerDTO> patchBeerById(UUID beerId, BeerDTO beer) {
+
+        AtomicReference<Optional<BeerDTO>> atomicReference = new AtomicReference<>();
+
+        beerRepository.findById(beerId).ifPresentOrElse(
                 foundBeer -> {
                     if(beer.getBeerName()!= foundBeer.getBeerName()) {
                         foundBeer.setBeerName(beer.getBeerName());
@@ -110,8 +114,16 @@ public class BeerServiceJPA implements BeerService {
                         foundBeer.setUpdateDate(beer.getUpdateDate());
                     }
 
-                    beerRepository.saveAndFlush(foundBeer);
-                }
+                    Beer patchedBeer = beerRepository.saveAndFlush(foundBeer);
+                    atomicReference.set(
+                            Optional.of(
+                                    beerMapper.beerToBeerDTO(patchedBeer)
+                            )
+                    );
+                },
+                () -> atomicReference.set(Optional.empty())
         );
+
+        return atomicReference.get();
     }
 }
