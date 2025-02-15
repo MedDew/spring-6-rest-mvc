@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +34,9 @@ public class CustomerController {
     @PatchMapping(path = {CUSTOMER_PATH+"/{id}"})
     public ResponseEntity updateCustomerPatchById(@PathVariable(name = "id") UUID customerId, @RequestBody CustomerDTO customer) {
 
-        customerService.patchCustomerById(customerId, customer);
+        if(customerService.patchCustomerById(customerId, customer).isEmpty()){
+            throw new NotFoundException();
+        }
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
