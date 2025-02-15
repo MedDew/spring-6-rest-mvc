@@ -1,6 +1,7 @@
 package guru.springframework.spring6restmvc.controller;
 
 import guru.springframework.spring6restmvc.entities.Customer;
+import guru.springframework.spring6restmvc.mappers.CustomerMapper;
 import guru.springframework.spring6restmvc.model.CustomerDTO;
 import guru.springframework.spring6restmvc.repositories.CustomerRepository;
 import jakarta.transaction.Transactional;
@@ -28,6 +29,32 @@ class CustomerControllerIT {
 
     @Autowired
     private CustomerRepository customerRepository;
+
+    @Autowired
+    private CustomerMapper customerMapper;
+
+
+    @org.springframework.transaction.annotation.Transactional
+    @Rollback
+    @Test
+    public void updateByIdTest(){
+
+        CustomerDTO customerDTO = customerMapper.customerToCustomerDTO(
+                customerRepository.findAll().get(00)
+        );
+        String customerName = "NAME UPDATED";
+        customerDTO.setCustomerName(customerName);
+
+
+        ResponseEntity responseEntity = customerController.updateById(
+                customerDTO.getId(), customerDTO
+        );
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+        Customer updatedCustomer = customerRepository.findById(customerDTO.getId()).get();
+        assertThat(updatedCustomer.getCustomerName()).isEqualTo(customerName);
+        assertThat(updatedCustomer.getLastModifiededDate()).isAfter(customerDTO.getLastModifiededDate());
+    }
 
     @Transactional
     @Rollback

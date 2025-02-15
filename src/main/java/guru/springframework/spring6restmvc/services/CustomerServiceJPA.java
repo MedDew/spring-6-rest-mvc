@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -49,7 +50,12 @@ public class CustomerServiceJPA implements CustomerService {
 
     @Override
     public void updateCustomerById(UUID customerId, CustomerDTO customer) {
-
+        Customer foundCustomer = customerRepository.findById(customerId).orElse(null);
+        if (foundCustomer != null) {
+            foundCustomer.setCustomerName(customer.getCustomerName());
+            foundCustomer.setLastModifiededDate(LocalDateTime.now());
+            customerRepository.saveAndFlush(foundCustomer);
+        }
     }
 
     @Override
