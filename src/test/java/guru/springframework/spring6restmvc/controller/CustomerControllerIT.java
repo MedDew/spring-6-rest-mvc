@@ -34,6 +34,13 @@ class CustomerControllerIT {
     private CustomerMapper customerMapper;
 
 
+    @Test
+    public void updateByIdNotFoundTest(){
+        assertThrows(NotFoundException.class,() -> {
+            customerController.updateById(UUID.randomUUID(), CustomerDTO.builder().build());
+        });
+    }
+
     @org.springframework.transaction.annotation.Transactional
     @Rollback
     @Test
