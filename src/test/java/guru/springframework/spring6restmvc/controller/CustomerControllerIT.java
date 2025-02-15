@@ -34,6 +34,26 @@ class CustomerControllerIT {
     private CustomerMapper customerMapper;
 
 
+    @Transactional
+    @Rollback
+    @Test
+    public void updateCustomerPatchByIdTest() {
+        CustomerDTO customer = customerMapper.customerToCustomerDTO(
+            customerRepository.findAll().get(0)
+        );
+        String customerName = "PATCH UPDATE";
+        customer.setCustomerName(customerName);
+
+        ResponseEntity responseEntity = customerController.updateCustomerPatchById(
+                customer.getId(), customer
+        );
+
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatusCode.valueOf(204));
+
+        Customer updatedCustomer = customerRepository.findById(customer.getId()).get();
+        assertThat(updatedCustomer.getCustomerName()).isEqualTo(customer.getCustomerName());
+    }
+
     @Test
     public void deleteByIdNotFoundTest() {
         assertThrows(
