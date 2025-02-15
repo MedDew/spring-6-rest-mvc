@@ -29,6 +29,8 @@ class CustomerControllerIT {
     @Autowired
     private CustomerRepository customerRepository;
 
+    @Transactional
+    @Rollback
     @Test
     public void handlePostTest(){
 
