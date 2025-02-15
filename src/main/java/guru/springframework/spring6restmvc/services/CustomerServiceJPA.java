@@ -80,8 +80,11 @@ public class CustomerServiceJPA implements CustomerService {
     }
 
     @Override
-    public void patchCustomerById(UUID customerId, CustomerDTO customer) {
-        customerRepository.findById(customerId).ifPresent(foundCustomer -> {
+    public Optional<CustomerDTO> patchCustomerById(UUID customerId, CustomerDTO customer) {
+
+        AtomicReference<Optional<CustomerDTO>> customerAtomicRef = new AtomicReference<>();
+
+        customerRepository.findById(customerId).ifPresentOrElse(foundCustomer -> {
            if(customer.getCustomerName() != null){
                foundCustomer.setCustomerName(customer.getCustomerName());
            }
@@ -89,7 +92,18 @@ public class CustomerServiceJPA implements CustomerService {
            if(customer.getLastModifiededDate().isAfter(foundCustomer.getLastModifiededDate())){
                foundCustomer.setLastModifiededDate(customer.getLastModifiededDate());
            }
-           customerRepository.saveAndFlush(foundCustomer);
-        });
+
+                    customerAtomicRef.set(
+                                Optional.of(
+                                customerMapper.customerToCustomerDTO(
+                                        customerRepository.saveAndFlush(foundCustomer)
+                                )
+                            )
+                    );
+        },
+                () -> customerAtomicRef.set(Optional.empty())
+        );
+
+        return customerAtomicRef.get();
     }
 }
